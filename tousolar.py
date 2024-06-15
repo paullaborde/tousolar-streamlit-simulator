@@ -3,8 +3,6 @@ Simulateur Tousolar sur Streamlit
 
 Simuler sa production solaire vs sa consommation réelle extraite d'Enedis
 
-There is also an accompanying png and pdf version
-
 https://tousolar.com
 
 v0.2

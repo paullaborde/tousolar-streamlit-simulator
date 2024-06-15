@@ -1,8 +1,10 @@
 # Tousolar simulator with Streamlite
 
-# todo
+## todo
 
-1. load enedis conso
-2. address focus
-3. production simulation
-4. conso vs prod 
+- fix enedis csv loading
+- merge df conso/prod
+- check azimut value
+- generate multi panel prod
+- graph df conso vs prod
+- check titles vs multi page app
