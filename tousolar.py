@@ -7,7 +7,7 @@ There is also an accompanying png and pdf version
 
 https://tousolar.com
 
-v1.0
+v0.2
 15 Juin 2024
 
 Author:
@@ -82,28 +82,37 @@ if len(results['features']) >0:
 # ------------------------------------------------------
 # 3. Production
 # ------------------------------------------------------
+    st.button("Calculer la production ici", type="primary")
 
-    url = f"https://re.jrc.ec.europa.eu/api/v5_2/seriescalc?lat={tmp_lat}&lon={tmp_lng}&raddatabase=PVGIS-SARAH&pvcalculation=1&peakpower=1.0&loss=14.0&angle={tmp_pitch}&aspect={tmp_azimuth}&outputformat=json"
-    r = requests.get(url)
-    result = r.json()
+    if st.button("Calculer la production ici"):
 
-    # Mean per hour on years
-    tmp_df = pd.DataFrame(result['outputs']['hourly'])
+        with st.status("Simulation production ...", expanded=True) as status:
+            st.write(f'Requête PVGIS sur {tmp_lat}/{tmp_lng}')
+            url = f"https://re.jrc.ec.europa.eu/api/v5_2/seriescalc?lat={tmp_lat}&lon={tmp_lng}&raddatabase=PVGIS-SARAH&pvcalculation=1&peakpower=1.0&loss=14.0&angle={tmp_pitch}&aspect={tmp_azimuth}&outputformat=json"
+            r = requests.get(url)
+            result = r.json()
 
-    # split date & time to compare with linky
-    tmp_df['datetime'] = pd.to_datetime(tmp_df['time'], format='%Y%m%d:%H%M')
-    tmp_df['month'] = pd.DatetimeIndex(tmp_df['datetime']).month
-    tmp_df['day'] = pd.DatetimeIndex(tmp_df['datetime']).day
-    tmp_df['hour'] = pd.DatetimeIndex(tmp_df['datetime']).hour
-    tmp_df['minute'] = pd.DatetimeIndex(tmp_df['datetime']).minute
+            # Mean per hour on years
+            st.write('Mise en forme des données')
+            tmp_df = pd.DataFrame(result['outputs']['hourly'])
 
-    # clean columns
-    tmp_df.drop(columns=['time', 'datetime', 'G(i)', 'H_sun', 'T2m', 'WS10m', 'Int'], inplace=True)
+            # split date & time to compare with linky
+            tmp_df['datetime'] = pd.to_datetime(tmp_df['time'], format='%Y%m%d:%H%M')
+            tmp_df['month'] = pd.DatetimeIndex(tmp_df['datetime']).month
+            tmp_df['day'] = pd.DatetimeIndex(tmp_df['datetime']).day
+            tmp_df['hour'] = pd.DatetimeIndex(tmp_df['datetime']).hour
+            tmp_df['minute'] = pd.DatetimeIndex(tmp_df['datetime']).minute
 
-    # mean power over years
-    mean = tmp_df.groupby(['month', 'day', 'hour', 'minute']).mean().to_dict()
-    power = [{'month':x[0], 'day':x[1], 'hour':x[2], 'minute':x[3], 'power':mean['P'][x]} for x in mean['P']]
-    prod_df = pd.DataFrame(power)
+            # clean columns
+            tmp_df.drop(columns=['time', 'datetime', 'G(i)', 'H_sun', 'T2m', 'WS10m', 'Int'], inplace=True)
 
-    st.write('3. Simulation de production par heure pour 1 panneau')
-    st.write(prod_df)
+            # mean power over years
+            st.write('Synthèse des données par heure')
+
+            mean = tmp_df.groupby(['month', 'day', 'hour', 'minute']).mean().to_dict()
+            power = [{'month':x[0], 'day':x[1], 'hour':x[2], 'minute':x[3], 'power':mean['P'][x]} for x in mean['P']]
+            prod_df = pd.DataFrame(power)
+
+            status.update(label="Données de production prêtes", state="complete", expanded=False)
+            st.write('3. Simulation de production par heure pour 1 panneau')
+            st.write(prod_df)
