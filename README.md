@@ -2,8 +2,7 @@
 
 ## todo
 
-- fix enedis csv loading
-- merge df conso/prod
+- merge df conso/prod --> 30 min to hour for prod
 - check azimut value
 - generate multi panel prod
 - graph df conso vs prod

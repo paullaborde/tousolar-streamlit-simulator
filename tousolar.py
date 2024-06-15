@@ -34,7 +34,10 @@ st.text('1. Consommation réelle')
 
 uploaded_file = st.file_uploader("Chargez votre consommation réelle depuis https://mon-compte-particulier.enedis.fr/")
 if uploaded_file is not None:
-    df_conso = pd.read_csv(uploaded_file, sep=';')
+    df_conso = pd.read_csv(uploaded_file, sep=';', header=2)
+    df_conso['datetime'] = pd.to_datetime(df_conso['Horodate'], format='%Y-%m-%dT%H:%M:%S%z')
+    df_conso.drop(columns=['Horodate'], inplace=True)
+    df_conso.rename(columns={'Valeur': 'consommation'}, inplace=True)
 
     st.write(df_conso)
 
@@ -92,24 +95,26 @@ if len(results['features']) >0:
 
             # Mean per hour on years
             st.write('Mise en forme des données')
-            tmp_df = pd.DataFrame(result['outputs']['hourly'])
+            prod_df = pd.DataFrame(result['outputs']['hourly'])
+            
 
             # split date & time to compare with linky
-            tmp_df['datetime'] = pd.to_datetime(tmp_df['time'], format='%Y%m%d:%H%M')
-            tmp_df['month'] = pd.DatetimeIndex(tmp_df['datetime']).month
-            tmp_df['day'] = pd.DatetimeIndex(tmp_df['datetime']).day
-            tmp_df['hour'] = pd.DatetimeIndex(tmp_df['datetime']).hour
-            tmp_df['minute'] = pd.DatetimeIndex(tmp_df['datetime']).minute
+            prod_df['datetime'] = pd.to_datetime(prod_df['time'], format='%Y%m%d:%H%M')
+            # tmp_df['month'] = pd.DatetimeIndex(tmp_df['datetime']).month
+            # tmp_df['day'] = pd.DatetimeIndex(tmp_df['datetime']).day
+            # tmp_df['hour'] = pd.DatetimeIndex(tmp_df['datetime']).hour
+            # tmp_df['minute'] = pd.DatetimeIndex(tmp_df['datetime']).minute
 
             # clean columns
-            tmp_df.drop(columns=['time', 'datetime', 'G(i)', 'H_sun', 'T2m', 'WS10m', 'Int'], inplace=True)
+            prod_df.drop(columns=['time', 'G(i)', 'H_sun', 'T2m', 'WS10m', 'Int'], inplace=True)
+            df_conso.rename(columns={'P': 'production'}, inplace=True)
 
             # mean power over years
-            st.write('Synthèse des données par heure')
+            # st.write('Synthèse des données par heure')
 
-            mean = tmp_df.groupby(['month', 'day', 'hour', 'minute']).mean().to_dict()
-            power = [{'month':x[0], 'day':x[1], 'hour':x[2], 'minute':x[3], 'power':mean['P'][x]} for x in mean['P']]
-            prod_df = pd.DataFrame(power)
+            # mean = tmp_df.groupby(['month', 'day', 'hour', 'minute']).mean().to_dict()
+            # power = [{'month':x[0], 'day':x[1], 'hour':x[2], 'minute':x[3], 'power':mean['P'][x]} for x in mean['P']]
+            # prod_df = pd.DataFrame(power)
 
             status.update(label="Données de production prêtes", state="complete", expanded=False)
             st.write('3. Simulation de production par heure pour 1 panneau')
