@@ -34,15 +34,18 @@ st.text('1. Consommation réelle')
 
 uploaded_file = st.file_uploader("Chargez votre consommation réelle depuis https://mon-compte-particulier.enedis.fr/")
 if uploaded_file is not None:
+    
+    # WORK ON conso data need to be linearized from 30 min to 1h, year can be kept
+
     df_conso = pd.read_csv(uploaded_file, sep=';', header=2)
-    df_conso['datetime'] = pd.to_datetime(df_conso['Horodate'], format='%Y-%m-%dT%H:%M:%S%z')
+    df_conso['datetime'] = pd.to_datetime(df_conso['Horodate'], format='%Y-%m-%dT%H:%M:%S%z', utc=True) # CHECK utc parameter !
     df_conso.drop(columns=['Horodate'], inplace=True)
     df_conso.rename(columns={'Valeur': 'consommation'}, inplace=True)
 
     st.write(df_conso)
 
 # ------------------------------------------------------
-# 2. Adress
+# 2. Address
 # ------------------------------------------------------
 st.text('2. Emplacement projet solaire')
 
@@ -93,29 +96,27 @@ if len(results['features']) >0:
             r = requests.get(url)
             result = r.json()
 
+            #  WORK ON Production data --> data over years need to be meaned and year remove from data set
+            
             # Mean per hour on years
             st.write('Mise en forme des données')
-            prod_df = pd.DataFrame(result['outputs']['hourly'])
-            
-
-            # split date & time to compare with linky
-            prod_df['datetime'] = pd.to_datetime(prod_df['time'], format='%Y%m%d:%H%M')
-            # tmp_df['month'] = pd.DatetimeIndex(tmp_df['datetime']).month
-            # tmp_df['day'] = pd.DatetimeIndex(tmp_df['datetime']).day
-            # tmp_df['hour'] = pd.DatetimeIndex(tmp_df['datetime']).hour
-            # tmp_df['minute'] = pd.DatetimeIndex(tmp_df['datetime']).minute
-
-            # clean columns
-            prod_df.drop(columns=['time', 'G(i)', 'H_sun', 'T2m', 'WS10m', 'Int'], inplace=True)
-            df_conso.rename(columns={'P': 'production'}, inplace=True)
+            df_prod = pd.DataFrame(result['outputs']['hourly'])            
+            df_prod['datetime'] = pd.to_datetime(df_prod['time'], format='%Y%m%d:%H%M', utc=True)
+            # tmp_pvgis['month'] = pd.DatetimeIndex(tmp_pvgis['datetime']).month
+            # tmp_pvgis['day'] = pd.DatetimeIndex(tmp_pvgis['datetime']).day
+            # tmp_pvgis['hour'] = pd.DatetimeIndex(tmp_pvgis['datetime']).hour
+            # tmp_pvgis['minute'] = pd.DatetimeIndex(tmp_pvgis['datetime']).minute
 
             # mean power over years
-            # st.write('Synthèse des données par heure')
+            df_prod.drop(columns=['time', 'G(i)', 'H_sun', 'T2m', 'WS10m', 'Int'], inplace=True)
+            df_prod.rename(columns={'P': 'production'}, inplace=True)
+            df_prod.resample('60min', on='datetime').sum()
 
-            # mean = tmp_df.groupby(['month', 'day', 'hour', 'minute']).mean().to_dict()
-            # power = [{'month':x[0], 'day':x[1], 'hour':x[2], 'minute':x[3], 'power':mean['P'][x]} for x in mean['P']]
-            # prod_df = pd.DataFrame(power)
+            # mean = tmp_pvgis.groupby(['month', 'day', 'hour', 'minute']).mean().to_dict()
+            # df_prod = pd.DataFrame([{'month':x[0], 'day':x[1], 'hour':x[2], 'minute':x[3], 'power':mean['production'][x]} for x in mean['production']])
+
+            data = pd.merge(df_conso, df_prod, 'left') # could be ok with right dataframes
 
             status.update(label="Données de production prêtes", state="complete", expanded=False)
-            st.write('3. Simulation de production par heure pour 1 panneau')
-            st.write(prod_df)
+        st.write('3. Simulation de production par heure pour 1 panneau')
+        st.write(data)
