@@ -35,7 +35,7 @@ st.text('1. Consommation réelle')
 uploaded_file = st.file_uploader("Chargez votre consommation réelle depuis https://mon-compte-particulier.enedis.fr/")
 if uploaded_file is not None:
     
-    # WORK ON conso data need to be linearized from 30 min to 1h, year can be kept
+    # WORK ON conso data need to be linearized from 30 min to 1h, year can be kept / rm datetime
 
     df_conso = pd.read_csv(uploaded_file, sep=';', header=2)
     df_conso['datetime'] = pd.to_datetime(df_conso['Horodate'], format='%Y-%m-%dT%H:%M:%S%z', utc=True) # CHECK utc parameter !
@@ -96,7 +96,7 @@ if len(results['features']) >0:
             r = requests.get(url)
             result = r.json()
 
-            #  WORK ON Production data --> data over years need to be meaned and year remove from data set
+            #  WORK ON Production data --> data over years need to be meaned and year remove from data set / rm datetime
             
             # Mean per hour on years
             st.write('Mise en forme des données')

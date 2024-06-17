@@ -2,8 +2,8 @@
 
 ## todo
 
-- merge df conso/prod --> 30 min to hour for prod
-- check azimut value
-- generate multi panel prod
-- graph df conso vs prod
-- check titles vs multi page app
+- 1h merge df conso/prod --> 30 min to hour for prod
+- 1h : graph df conso vs prod
+- 1h check azimut value
+- 2h : generate multi panel prod
+- 1h : check titles vs multi page app
