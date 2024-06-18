@@ -30,7 +30,9 @@ st.set_page_config(
 # ------------------------------------------------------
 # 1. Conso
 # ------------------------------------------------------
-st.text('1. Consommation réelle')
+st.title('Simulateur production vs consommation :blue[Tousolar]')
+
+st.header('1. Consommation réelle', divider='rainbow')
 
 uploaded_file = st.file_uploader("Chargez votre consommation réelle depuis https://mon-compte-particulier.enedis.fr/")
 if uploaded_file is not None:
@@ -55,7 +57,7 @@ if uploaded_file is not None:
 # ------------------------------------------------------
 # 2. Address
 # ------------------------------------------------------
-st.text('2. Emplacement projet solaire')
+st.header('2. Emplacement projet solaire', divider='rainbow')
 
 address = st.text_input("Indiquez l'adresse du projet")
 
@@ -94,9 +96,9 @@ if len(results['features']) >0:
 # ------------------------------------------------------
 # 3. Production
 # ------------------------------------------------------
-    st.button("Calculer la production ici", type="primary")
+    st.header('3. Simuler la production solaire', divider='rainbow')
 
-    if st.button("Calculer la production ici"):
+    if st.button("Lancer la simulation"):
 
         with st.status("Simulation production ...", expanded=True) as status:
             st.write(f'Requête PVGIS sur {tmp_lat}/{tmp_lng}')
@@ -126,7 +128,8 @@ if len(results['features']) >0:
 
             status.update(label="Données de production prêtes", state="complete", expanded=False)
 
-        st.write('3. Simulation de production par heure pour 1 panneau')
+        st.header('4. Résultat', divider='rainbow')
+
         st.line_chart(data, x='datetime', y=['production', 'consommation'], color=["#FF0000", "#0000FF"])
 
         st.write('Données brutes :')
