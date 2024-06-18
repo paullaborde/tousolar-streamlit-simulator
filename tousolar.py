@@ -5,11 +5,11 @@ Simuler sa production solaire vs sa consommation réelle extraite d'Enedis
 
 https://tousolar.com
 
-v0.2
-15 Juin 2024
+v0.3
+18 Juin 2024
 
 Author:
-    paul.laborde@laposte.net
+    paullaborde@laposte.net
 """
 
 import streamlit as st
