@@ -1,6 +1,5 @@
 # Tousolar simulator with Streamlite
 
-## check
+## todo
 
-- azimut pour PVGIS ?
-- Power pour 1kwc ?
+- fix step 3 reloading on data update, need to fix page or step management

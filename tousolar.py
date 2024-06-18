@@ -93,9 +93,9 @@ if uploaded_file is not None:
             st.map(data, zoom=17)
 
 
-        # ------------------------------------------------------
-        # 3. Production
-        # ------------------------------------------------------
+            # ------------------------------------------------------
+            # 3. Production
+            # ------------------------------------------------------
             st.header('3. Simuler la production solaire', divider='rainbow')
 
             if st.button("Lancer la simulation"):
@@ -119,7 +119,7 @@ if uploaded_file is not None:
                     tmp_pvgis.drop(columns=['time', 'G(i)', 'H_sun', 'T2m', 'WS10m', 'Int'], inplace=True)
                     tmp_pvgis.rename(columns={'P': 'production'}, inplace=True)
                     mean = tmp_pvgis.groupby(['month', 'day', 'hour', 'minute']).mean().to_dict()
-                    df_prod = pd.DataFrame([{'month':x[0], 'day':x[1], 'hour':x[2], 'minute':x[3], 'production':mean['production'][x]} for x in mean['production']])
+                    df_prod = pd.DataFrame([{'month':x[0], 'day':x[1], 'hour':x[2], 'minute':x[3], 'production_1kwc':mean['production'][x]} for x in mean['production']])
 
                     data = pd.merge(df_conso, df_prod, 'left')
                     data['dt_txt'] = data.year.astype(str) + '/' + data.month.astype(str) + '/' + data.day.astype(str) + ' ' + data.hour.astype(str) + ':' + data.minute.astype(str)
@@ -130,7 +130,12 @@ if uploaded_file is not None:
 
                 st.header('4. Résultat', divider='rainbow')
 
-                st.line_chart(data, x='datetime', y=['production', 'consommation'], color=["#FF0000", "#0000FF"])
+                def update_df():
+                    data['production'] = data['production_1kwc'] * st.session_state.power
 
+                data['production'] = data['production_1kwc']
+                st.slider('Puissance (kwc)', min_value=1, max_value=9, key="power", on_change=update_df)
+                st.line_chart(data, x='datetime', y=['production', 'consommation'], color=["#FF0000", "#0000FF"])
+                
                 st.write('Données brutes :')
-                st.write(data)
+                st.write(data[['datetime', 'consommation', 'production']])
