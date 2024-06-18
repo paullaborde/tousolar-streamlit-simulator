@@ -44,13 +44,13 @@ if uploaded_file is not None:
     tmp_conso['minute'] = pd.DatetimeIndex(tmp_conso['datetime']).minute
     
     tmp_conso.rename(columns={'Valeur': 'consumption'}, inplace=True)
-    tmp_conso.drop(columns=['year', 'datetime', 'dt_noz', 'Horodate'], inplace=True)
+    tmp_conso.drop(columns=['datetime', 'dt_noz', 'Horodate'], inplace=True)
 
-    grouped = tmp_conso.groupby(['month', 'day', 'hour']).sum()/2 # 30MIN data is an average, when summed it needs to be averaged on hour
+    grouped = tmp_conso.groupby(['year', 'month', 'day', 'hour']).sum()/2 # 30MIN data is an average, when summed it needs to be averaged on hour
     sum = grouped.to_dict()
-    df_conso = pd.DataFrame([{'month':x[0], 'day':x[1], 'hour':x[2], 'consumption':sum['consumption'][x]} for x in sum['consumption']])
+    df_conso = pd.DataFrame([{'year':x[0], 'month':x[1], 'day':x[2], 'hour':x[3], 'consommation':sum['consumption'][x]} for x in sum['consumption']])
 
-    st.write(df_conso)
+    # st.write(df_conso)
 
 # ------------------------------------------------------
 # 2. Address
@@ -120,7 +120,15 @@ if len(results['features']) >0:
             df_prod = pd.DataFrame([{'month':x[0], 'day':x[1], 'hour':x[2], 'minute':x[3], 'production':mean['production'][x]} for x in mean['production']])
 
             data = pd.merge(df_conso, df_prod, 'left')
+            data['dt_txt'] = data.year.astype(str) + '/' + data.month.astype(str) + '/' + data.day.astype(str) + ' ' + data.hour.astype(str) + ':' + data.minute.astype(str)
+            data['datetime'] = pd.to_datetime(data['dt_txt'], format='%Y/%m/%d %H:%M')
+            data.drop(columns=['year', 'month', 'day', 'hour', 'minute', 'dt_txt'], inplace=True)
 
             status.update(label="Données de production prêtes", state="complete", expanded=False)
+
         st.write('3. Simulation de production par heure pour 1 panneau')
+        st.line_chart(data, x='datetime', y=['production', 'consommation'], color=["#FF0000", "#0000FF"])
+
+        st.write('Données brutes :')
         st.write(data)
+
