@@ -74,6 +74,7 @@ if uploaded_file is not None:
 
             r = requests.get(url_insight)
             results = r.json()
+            print('prod debug :(', results)
 
             roof_segments = len(results['solarPotential']['roofSegmentStats'])
             tmp_pitch = results['solarPotential']['roofSegmentStats'][0]['pitchDegrees']
