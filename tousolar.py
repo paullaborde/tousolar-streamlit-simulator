@@ -101,7 +101,7 @@ if len(results['features']) >0:
 # ------------------------------------------------------
 # 3. Production
 # ------------------------------------------------------
-st.header('3. Simuler la production solaire', divider='rainbow')
+st.header('3. Simulation de production solaire', divider='rainbow')
 
 if st.button("Lancer la simulation"):
     with st.status("Simulation production ...", expanded=True) as status:
