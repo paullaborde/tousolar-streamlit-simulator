@@ -1,5 +1,8 @@
 # Tousolar simulator with Streamlite
 
-## todo
+Steps : 
 
-- fix step 3 reloading on data update, need to fix page or step management
+- import Enedis data
+- geolocate project for roof informations
+- simulate with pvgis production data
+- merge consumption & production data for 4 configurations 
