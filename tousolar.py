@@ -139,7 +139,17 @@ if st.button("Lancer la simulation"):
 # ------------------------------------------------------
 st.header('4. Résultat', divider='rainbow')
 
-st.line_chart(data, x='datetime', y=['production_1kwc', 'production_3kwc', 'production_6kwc', 'production_9kwc', 'consommation'], color=["#FFFF00", "#FFAA00", "#FF5500", "#FF0000", "#4D4DFF"])
+st.write('Consommation vs Production 1kwc (~3 panneaux)')
+st.line_chart(data, x='datetime', y=['production_1kwc', 'consommation'])
+
+st.write('Consommation vs Production 3kwc (~7 panneaux)')
+st.line_chart(data, x='datetime', y=['production_3kwc', 'consommation'])
+
+st.write('Consommation vs Production 6kwc (~14 panneaux)')
+st.line_chart(data, x='datetime', y=['production_6kwc', 'consommation'])
+
+st.write('Consommation vs Production 9kwc (~21 panneaux)')
+st.line_chart(data, x='datetime', y=['production_9kwc', 'consommation'])
 
 st.write('Données brutes :')
 st.write(data)
