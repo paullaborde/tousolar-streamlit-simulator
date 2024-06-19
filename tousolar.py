@@ -6,7 +6,7 @@ Simuler sa production solaire vs sa consommation réelle extraite d'Enedis
 https://tousolar.com
 
 v1.0
-19 Juin 2024
+19 June 2024
 
 Author:
     paullaborde@laposte.net
@@ -37,7 +37,8 @@ data = pd.DataFrame([{'datetime':0, 'production_1kwc':0, 'production_3kwc':0,'pr
 # ------------------------------------------------------
 st.header('1. Consommation réelle', divider='rainbow')
 
-uploaded_file = st.file_uploader("Chargez votre consommation réelle depuis https://mon-compte-particulier.enedis.fr/")
+uploaded_file = st.file_uploader("Chargez votre consommation réelle depuis https://mon-compte-particulier.enedis.fr/ : Suivre mes mesures → Télécharger mes données")
+
 if uploaded_file is not None:
     tmp_conso = pd.read_csv(uploaded_file, sep=';', header=2)
     tmp_conso['dt_noz'] = tmp_conso.Horodate.str[:-6]
